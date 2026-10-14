@@ -1,11 +1,10 @@
-import type { IssuePriority, IssueStatus, UserRole } from "./status";
+import type { IssuePriority, IssueStatus } from "./status";
 
 export type Profile = {
   _id: string;
   fullName: string | null;
   email: string | null;
-  role: UserRole;
-  phone: string | null;
+  role: import("./status").UserRole;
   departmentId: string | null;
   createdAt: number;
 };
@@ -22,22 +21,7 @@ export type Department = {
   name: string;
 };
 
-export type IssueImage = {
-  _id: string;
-  storageId: string;
-  url?: string;
-};
-
-export type IssueUpdate = {
-  _id: string;
-  fromStatus: IssueStatus | null;
-  toStatus: IssueStatus;
-  note: string | null;
-  authorName: string | null;
-  createdAt: number;
-};
-
-/** Client-facing shape of an issue as returned by Convex queries. */
+/** Client-facing shape returned by issues.listMine / listAll / listAssigned. */
 export type Issue = {
   _id: string;
   title: string;
@@ -48,8 +32,49 @@ export type Issue = {
   longitude: number | null;
   address: string | null;
   duplicateOf: string | null;
+  rejectionReason: string | null;
   createdAt: number;
-  updatedAt: number;
-  categoryName?: string;
-  imageUrls?: string[];
+  updatedAt: number | null;
+  categoryName: string | null;
+  imageUrls: string[];
+};
+
+export type IssueUpdateEntry = {
+  _id: string;
+  fromStatus: IssueStatus | null;
+  toStatus: IssueStatus;
+  note: string | null;
+  authorName: string | null;
+  createdAt: number;
+};
+
+export type IssueAssignmentInfo = {
+  _id: string;
+  departmentId: string;
+  departmentName: string | null;
+  workerId: string | null;
+  workerName: string | null;
+  createdAt: number;
+};
+
+/** Client-facing shape returned by issues.get. */
+export type IssueDetail = Issue & {
+  duplicateOfTitle: string | null;
+  resolvedAt: number | null;
+  images: Array<{
+    _id: string;
+    storageId: string;
+    url: string | null;
+  }>;
+  updates: IssueUpdateEntry[];
+  activeAssignment: IssueAssignmentInfo | null;
+};
+
+export type NotificationItem = {
+  _id: string;
+  issueId: string | null;
+  title: string;
+  body: string;
+  readAt: number | null;
+  createdAt: number;
 };

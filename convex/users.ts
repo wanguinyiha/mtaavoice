@@ -11,6 +11,7 @@ export const getCurrent = query({
       _id: v.id("users"),
       fullName: v.union(v.string(), v.null()),
       email: v.union(v.string(), v.null()),
+      phone: v.union(v.string(), v.null()),
       role: v.union(
         v.literal("CITIZEN"),
         v.literal("ADMIN"),
@@ -29,6 +30,7 @@ export const getCurrent = query({
       _id: user._id,
       fullName: user.name ?? null,
       email: user.email ?? null,
+      phone: user.phone ?? null,
       role: user.role ?? "CITIZEN",
       departmentId: user.departmentId ?? null,
       createdAt: user._creationTime,

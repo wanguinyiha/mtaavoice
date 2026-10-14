@@ -159,6 +159,12 @@ export const create = mutation({
     ) {
       throw new Error("Longitude must be between -180 and 180");
     }
+    const hasAddress = (args.address?.trim().length ?? 0) > 0;
+    if (args.latitude === undefined && !hasAddress) {
+      throw new Error(
+        "Confirm your location: use GPS coordinates or describe the location",
+      );
+    }
     if (args.imageStorageIds.length > MAX_IMAGES) {
       throw new Error(`You can attach at most ${MAX_IMAGES} photos`);
     }
