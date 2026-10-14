@@ -10,6 +10,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Convex generated code and the read-only React Native reference app:
+    "convex/_generated/**",
+    "mtaavoice/**",
   ]),
 ]);
 
