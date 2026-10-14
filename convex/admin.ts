@@ -1,5 +1,6 @@
 import { v } from "convex/values";
-import { internalMutation } from "./_generated/server";
+import { internalMutation, query } from "./_generated/server";
+import { requireAdmin } from "./lib/helpers";
 
 /**
  * One-time admin bootstrap / role management.
@@ -36,3 +37,39 @@ export const setUserRole = internalMutation({
     return null;
   },
 });
+
+export const stats = query({
+  args: {},
+  returns: v.object({
+    total: v.number(),
+    byStatus: v.object({
+      SUBMITTED: v.number(),
+      UNDER_REVIEW: v.number(),
+      ACCEPTED: v.number(),
+      ASSIGNED: v.number(),
+      IN_PROGRESS: v.number(),
+      RESOLVED: v.number(),
+      REJECTED: v.number(),
+      DUPLICATE: v.number(),
+    }),
+  }),
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    const rows = await ctx.db.query("issues").take(500);
+    const byStatus = {
+      SUBMITTED: 0,
+      UNDER_REVIEW: 0,
+      ACCEPTED: 0,
+      ASSIGNED: 0,
+      IN_PROGRESS: 0,
+      RESOLVED: 0,
+      REJECTED: 0,
+      DUPLICATE: 0,
+    };
+    for (const row of rows) {
+      byStatus[row.status] += 1;
+    }
+    return { total: rows.length, byStatus };
+  },
+});
+

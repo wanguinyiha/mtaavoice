@@ -17,7 +17,12 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
     { href: "/reports", label: "My Reports" },
     { href: "/profile", label: "Profile" },
   ],
-  ADMIN: [{ href: "/admin", label: "Admin" }],
+  ADMIN: [
+    { href: "/admin", label: "Dashboard" },
+    { href: "/admin/queue", label: "Review Queue" },
+    { href: "/admin/reports", label: "All Reports" },
+    { href: "/admin/departments", label: "Departments" },
+  ],
   FIELD_WORKER: [{ href: "/field-worker", label: "Assigned" }],
 };
 

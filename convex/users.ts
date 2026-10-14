@@ -1,7 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { requireUser } from "./lib/helpers";
+import { requireAdmin, requireUser } from "./lib/helpers";
 
 export const getCurrent = query({
   args: {},
@@ -59,5 +59,53 @@ export const updateProfile = mutation({
     }
     // Role and department are intentionally not updatable here.
     return null;
+  },
+});
+
+export const listWorkers = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      _id: v.id("users"),
+      name: v.union(v.string(), v.null()),
+      email: v.union(v.string(), v.null()),
+      departmentId: v.union(v.id("departments"), v.null()),
+      departmentName: v.union(v.string(), v.null()),
+    }),
+  ),
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    const users = await ctx.db.query("users").take(500);
+    const workers = users
+      .filter((user) => (user.role ?? "CITIZEN") === "FIELD_WORKER")
+      .map((user) => ({
+        _id: user._id,
+        name: user.name ?? null,
+        email: user.email ?? null,
+        departmentId: user.departmentId ?? null,
+      }));
+
+    const departmentIds = new Set(
+      workers
+        .map((worker) => worker.departmentId)
+        .filter((id) => id !== null),
+    );
+    const departmentNames = new Map<string, string>();
+    for (const departmentId of departmentIds) {
+      const department = await ctx.db.get(departmentId);
+      if (department !== null) {
+        departmentNames.set(departmentId, department.name);
+      }
+    }
+
+    return workers
+      .map((worker) => ({
+        ...worker,
+        departmentName:
+          worker.departmentId !== null
+            ? (departmentNames.get(worker.departmentId) ?? null)
+            : null,
+      }))
+      .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
   },
 });

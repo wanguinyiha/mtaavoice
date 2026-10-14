@@ -65,3 +65,47 @@ export const rename = mutation({
     return null;
   },
 });
+
+export const listStats = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      _id: v.id("departments"),
+      name: v.string(),
+      workerCount: v.number(),
+      activeAssignments: v.number(),
+    }),
+  ),
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    const departments = await ctx.db.query("departments").withIndex("by_name").take(50);
+    const users = await ctx.db.query("users").take(1000);
+    const assignments = await ctx.db.query("assignments").take(1000);
+
+    const workerCounts = new Map<string, number>();
+    for (const user of users) {
+      if ((user.role ?? "CITIZEN") !== "FIELD_WORKER") continue;
+      if (user.departmentId === undefined) continue;
+      workerCounts.set(
+        user.departmentId,
+        (workerCounts.get(user.departmentId) ?? 0) + 1,
+      );
+    }
+
+    const activeCounts = new Map<string, number>();
+    for (const assignment of assignments) {
+      if (!assignment.isActive) continue;
+      activeCounts.set(
+        assignment.departmentId,
+        (activeCounts.get(assignment.departmentId) ?? 0) + 1,
+      );
+    }
+
+    return departments.map((department) => ({
+      _id: department._id,
+      name: department.name,
+      workerCount: workerCounts.get(department._id) ?? 0,
+      activeAssignments: activeCounts.get(department._id) ?? 0,
+    }));
+  },
+});
