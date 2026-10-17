@@ -48,24 +48,36 @@ export function IssueDetailView({
         {issue.categoryName ? ` · ${issue.categoryName}` : ""}
       </p>
 
-      {issue.imageUrls.length > 0 ? (
+      {issue.images.length > 0 ? (
         <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-          {issue.imageUrls.map((url, index) => (
-            <a
-              key={url}
-              href={url}
-              target="_blank"
-              rel="noreferrer"
-              title={`Open photo ${index + 1} full size`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={url}
-                alt={`Photo ${index + 1} of ${issue.title}`}
-                className="h-[140px] w-[140px] shrink-0 rounded-lg border border-line object-cover"
-              />
-            </a>
-          ))}
+          {issue.images
+            .filter((image) => image.url !== null)
+            .map((image, index) => (
+              <a
+                key={image._id}
+                href={image.url!}
+                target="_blank"
+                rel="noreferrer"
+                title={`Open photo ${index + 1} full size`}
+                className="relative shrink-0"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={image.url!}
+                  alt={
+                    image.isEvidence
+                      ? `Evidence photo ${index + 1} of ${issue.title}`
+                      : `Photo ${index + 1} of ${issue.title}`
+                  }
+                  className="h-[140px] w-[140px] rounded-lg border border-line object-cover"
+                />
+                {image.isEvidence ? (
+                  <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                    Evidence
+                  </span>
+                ) : null}
+              </a>
+            ))}
         </div>
       ) : null}
 

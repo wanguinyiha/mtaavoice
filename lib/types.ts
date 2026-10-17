@@ -65,6 +65,7 @@ export type IssueDetail = Issue & {
     _id: string;
     storageId: string;
     url: string | null;
+    isEvidence: boolean | null;
   }>;
   updates: IssueUpdateEntry[];
   activeAssignment: IssueAssignmentInfo | null;

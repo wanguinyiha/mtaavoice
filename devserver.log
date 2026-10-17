@@ -1,0 +1,71 @@
+
+> mtaavoice@0.1.0 dev
+> next dev
+
+▲ Next.js 16.4.0 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.104:3000
+- Environments: .env.local
+✓ Ready in 3.6s
+✓ Running next.config.mjs took 198ms
+- Cache Components enabled
+- Partial Prefetching enabled
+
+○ Compiling /field-worker ...
+ GET /field-worker 200 in 2.8s (next.js: 1204ms, application-code: 1587ms)
+ GET /field-worker/assignments 200 in 312ms (next.js: 53ms, application-code: 260ms)
+ GET /field-worker/assignments/abc123 200 in 3.8s (next.js: 48ms, generate-params: 3.4s, application-code: 333ms)
+Error: Route "/field-worker": Could not validate that a segment in your UI has instant navigation.
+
+This segment was dropped from rendering. Issues that would prevent instant navigation will go undetected.
+
+Dropped segment:
+  app/(field-worker)/field-worker/page.tsx
+
+Ways to fix this:
+  - [render] Render the dropped segment
+  - [ignore] Set `export const instant = false` to opt the dropped segment out of instant-navigation validation
+
+Learn more: https://nextjs.org/docs/messages/instant-unrendered-segment
+    at ignore-listed frames
+ GET /profile 200 in 275ms (next.js: 51ms, application-code: 224ms)
+Error: Route "/field-worker/assignments": Could not validate that a segment in your UI has instant navigation.
+
+This segment was dropped from rendering. Issues that would prevent instant navigation will go undetected.
+
+Dropped segment:
+  app/(field-worker)/field-worker/assignments/page.tsx
+
+Ways to fix this:
+  - [render] Render the dropped segment
+  - [ignore] Set `export const instant = false` to opt the dropped segment out of instant-navigation validation
+
+Learn more: https://nextjs.org/docs/messages/instant-unrendered-segment
+    at ignore-listed frames
+Error: Route "/field-worker/assignments/[id]": Could not validate that a segment in your UI has instant navigation.
+
+This segment was dropped from rendering. Issues that would prevent instant navigation will go undetected.
+
+Dropped segment:
+  app/(field-worker)/field-worker/assignments/[id]/page.tsx
+
+Ways to fix this:
+  - [render] Render the dropped segment
+  - [ignore] Set `export const instant = false` to opt the dropped segment out of instant-navigation validation
+
+Learn more: https://nextjs.org/docs/messages/instant-unrendered-segment
+    at ignore-listed frames
+Error: Route "/profile": Could not validate that a segment in your UI has instant navigation.
+
+This segment was dropped from rendering. Issues that would prevent instant navigation will go undetected.
+
+Dropped segment:
+  app/(account)/profile/page.tsx
+
+Ways to fix this:
+  - [render] Render the dropped segment
+  - [ignore] Set `export const instant = false` to opt the dropped segment out of instant-navigation validation
+
+Learn more: https://nextjs.org/docs/messages/instant-unrendered-segment
+    at ignore-listed frames
+ GET / 200 in 634ms (next.js: 76ms, application-code: 559ms)

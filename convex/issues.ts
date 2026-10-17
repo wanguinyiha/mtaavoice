@@ -61,6 +61,7 @@ const detailValidator = v.object({
       _id: v.id("issueImages"),
       storageId: v.id("_storage"),
       url: v.union(v.string(), v.null()),
+      isEvidence: v.union(v.boolean(), v.null()),
     }),
   ),
   updates: v.array(updateValidator),
@@ -460,6 +461,57 @@ export const assign = mutation({
   },
 });
 
+export const addEvidence = mutation({
+  args: {
+    issueId: v.id("issues"),
+    imageStorageIds: v.array(v.id("_storage")),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const authed = await requireRole(ctx, ["FIELD_WORKER"]);
+    const issue = await ctx.db.get(args.issueId);
+    if (issue === null) throw new Error("Issue not found");
+    if (!["ASSIGNED", "IN_PROGRESS", "RESOLVED"].includes(issue.status)) {
+      throw new Error("Evidence can only be added to assigned issues");
+    }
+    await assertFieldWorkerCanAccess(ctx, authed, issue._id, true);
+    if (args.imageStorageIds.length === 0) {
+      throw new Error("Attach at least one photo");
+    }
+    const existing = await ctx.db
+      .query("issueImages")
+      .withIndex("by_issue", (q) => q.eq("issueId", issue._id))
+      .take(MAX_IMAGES + 1);
+    if (existing.length + args.imageStorageIds.length > MAX_IMAGES) {
+      throw new Error(
+        `An issue can have at most ${MAX_IMAGES} photos in total`,
+      );
+    }
+    for (const storageId of args.imageStorageIds) {
+      await ctx.db.insert("issueImages", {
+        issueId: issue._id,
+        storageId,
+        uploadedBy: authed.userId,
+        isEvidence: true,
+      });
+    }
+    await ctx.db.patch(issue._id, { updatedAt: Date.now() });
+    await ctx.db.insert("issueUpdates", {
+      issueId: issue._id,
+      authorId: authed.userId,
+      toStatus: issue.status,
+      note: `Added ${args.imageStorageIds.length} evidence photo${args.imageStorageIds.length === 1 ? "" : "s"}`,
+    });
+    await ctx.db.insert("notifications", {
+      userId: issue.reporterId,
+      issueId: issue._id,
+      title: "Progress update",
+      body: `New evidence photos were added to "${issue.title}".`,
+    });
+    return null;
+  },
+});
+
 async function assertFieldWorkerCanAccess(
   ctx: Ctx,
   authed: AuthedUser,
@@ -492,11 +544,16 @@ async function buildDetail(ctx: QueryCtx, issue: Doc<"issues">) {
     .query("issueImages")
     .withIndex("by_issue", (q) => q.eq("issueId", issue._id))
     .take(10);
-  const imageList = [];
+    const imageList = [];
   const imageUrls: string[] = [];
   for (const image of images) {
     const url = await ctx.storage.getUrl(image.storageId);
-    imageList.push({ _id: image._id, storageId: image.storageId, url });
+    imageList.push({
+      _id: image._id,
+      storageId: image.storageId,
+      url,
+      isEvidence: image.isEvidence ?? null,
+    });
     if (url !== null) imageUrls.push(url);
   }
 

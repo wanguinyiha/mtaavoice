@@ -59,6 +59,7 @@ export default defineSchema({
     issueId: v.id("issues"),
     storageId: v.id("_storage"),
     uploadedBy: v.id("users"),
+    isEvidence: v.optional(v.boolean()),
   }).index("by_issue", ["issueId"]),
 
   issueUpdates: defineTable({
