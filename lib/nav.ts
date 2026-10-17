@@ -11,3 +11,15 @@ export function homePathForRole(role: UserRole): string {
       return "/dashboard";
   }
 }
+
+/** Role-appropriate detail page for an issue (notifications deep-link here). */
+export function detailPathForRole(role: UserRole, issueId: string): string {
+  switch (role) {
+    case "ADMIN":
+      return `/admin/reports/${issueId}`;
+    case "FIELD_WORKER":
+      return `/field-worker/assignments/${issueId}`;
+    default:
+      return `/reports/${issueId}`;
+  }
+}

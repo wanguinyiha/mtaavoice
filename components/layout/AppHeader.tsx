@@ -7,6 +7,7 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/cn";
 import { homePathForRole } from "@/lib/nav";
+import { NotificationsBell } from "./NotificationsBell";
 
 type NavItem = { href: string; label: string };
 
@@ -15,6 +16,7 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/report", label: "Report" },
     { href: "/reports", label: "My Reports" },
+    { href: "/map", label: "Map" },
     { href: "/profile", label: "Profile" },
   ],
   ADMIN: [
@@ -84,14 +86,16 @@ export function AppHeader() {
           ) : null}
         </nav>
 
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls="app-mobile-nav"
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((value) => !value)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line-strong text-neutral-700 md:hidden"
-        >
+        <div className="flex items-center gap-2">
+          <NotificationsBell />
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls="app-mobile-nav"
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen((value) => !value)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line-strong text-neutral-700 md:hidden"
+          >
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -106,7 +110,8 @@ export function AppHeader() {
               <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
             )}
           </svg>
-        </button>
+          </button>
+        </div>
       </div>
 
       <div

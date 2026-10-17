@@ -249,6 +249,52 @@ export const listAll = query({
   },
 });
 
+const OPEN_STATUSES = [
+  "SUBMITTED",
+  "UNDER_REVIEW",
+  "ACCEPTED",
+  "ASSIGNED",
+  "IN_PROGRESS",
+] as const;
+
+export const listMap = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      _id: v.id("issues"),
+      title: v.string(),
+      status: statusValidator,
+      priority: priorityValidator,
+      latitude: v.union(v.number(), v.null()),
+      longitude: v.union(v.number(), v.null()),
+      address: v.union(v.string(), v.null()),
+      categoryName: v.union(v.string(), v.null()),
+    }),
+  ),
+  handler: async (ctx) => {
+    await requireUser(ctx);
+    const issues = await ctx.db.query("issues").order("desc").take(200);
+    const result = [];
+    for (const issue of issues) {
+      if (!(OPEN_STATUSES as readonly string[]).includes(issue.status)) {
+        continue;
+      }
+      const category = await ctx.db.get(issue.categoryId);
+      result.push({
+        _id: issue._id,
+        title: issue.title,
+        status: issue.status,
+        priority: issue.priority,
+        latitude: issue.latitude ?? null,
+        longitude: issue.longitude ?? null,
+        address: issue.address ?? null,
+        categoryName: category?.name ?? null,
+      });
+    }
+    return result;
+  },
+});
+
 export const listAssigned = query({
   args: {},
   returns: v.array(listItemValidator),
