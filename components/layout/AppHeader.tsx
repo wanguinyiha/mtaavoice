@@ -7,6 +7,7 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/cn";
 import { homePathForRole } from "@/lib/nav";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { NotificationsBell } from "./NotificationsBell";
 
 type NavItem = { href: string; label: string };
@@ -87,7 +88,9 @@ export function AppHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <NotificationsBell />
+          <ErrorBoundary>
+            <NotificationsBell />
+          </ErrorBoundary>
           <button
             type="button"
             aria-expanded={open}
